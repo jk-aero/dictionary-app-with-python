@@ -1,4 +1,6 @@
 import requests
+import pygame
+import sys
 
 def randomword():
     response = requests.get("https://api.urbandictionary.com/v0/random")
@@ -15,9 +17,26 @@ def wordData(word):
     defenition = (api_data)['list'][0]['definition']
     return defenition
 
+def add_newlines(long_string, max_line_length=50):
+    words = long_string.split()
+    lines = []
+    current_line = ''
 
-import pygame
-import sys
+    for word in words:
+        if len(current_line) + len(word) + 1 <= max_line_length:
+            if current_line:
+                current_line += ' '
+            current_line += word
+        else:
+            lines.append(current_line)
+            current_line = word
+
+    if current_line:
+        lines.append(current_line)
+
+    return '\n'.join(lines)
+
+
 
 # Initialize Pygame
 pygame.init()
@@ -84,6 +103,7 @@ while True:
             if ButtonRect.collidepoint(event.pos):
                 if user_text:                    
                     defenition=wordData(user_text)
+                    defenition = add_newlines(defenition, max_line_length=30)
                         
     
     # Clear the screen
@@ -97,13 +117,15 @@ while True:
     text_surface1 = Title_font.render(heading_text, True, BLACK)
     text_surface2 = subTitle_font.render(subHeading, True, BLACK)
     text_surface3 = subTitle_font.render("ENTER", True, WHITE)
-    text_surface4 = subTitle_font.render(f"meaning : {defenition}", True, BLACK)
+    text_surface4 = subTitle_font.render("meaning : ", True, BLACK)
+    text_surface5 = subTitle_font.render(f"{defenition} ", True, BLACK)
 
     screen.blit(text_surface1, (60, 30))
     screen.blit(text_surface2, (350, 160))
     screen.blit(text_surface, (InputRect.x+10, InputRect.y+5))
     screen.blit(text_surface3, (ButtonRect.x+10, ButtonRect.y+13))
     screen.blit(text_surface4, (ButtonRect.x+10, ButtonRect.y+80))
+    screen.blit(text_surface5, (ButtonRect.x+100, ButtonRect.y+80))
     #input text dynamic width
     InputRect.width=max(250,text_surface.get_width()+15)
 
